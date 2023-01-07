@@ -9,10 +9,12 @@ import { Person } from "shared/models/person"
 import { useApi } from "shared/hooks/use-api"
 import { StudentListTile } from "staff-app/components/student-list-tile/student-list-tile.component"
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
+import { Search } from "./Search"
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     void getStudents()
@@ -30,10 +32,15 @@ export const HomeBoardPage: React.FC = () => {
     }
   }
 
+  const handleSearch = (e: any) => {
+    const { value } = e.target;
+    setSearchText(value)
+  }
+
   return (
     <>
       <S.PageContainer>
-        <Toolbar onItemClick={onToolbarAction} />
+        <Toolbar onItemClick={onToolbarAction} searchText={searchText} handleSearch={handleSearch} />
 
         {loadState === "loading" && (
           <CenteredContainer>
@@ -63,13 +70,16 @@ export const HomeBoardPage: React.FC = () => {
 type ToolbarAction = "roll" | "sort"
 interface ToolbarProps {
   onItemClick: (action: ToolbarAction, value?: string) => void
+  searchText: string
+  handleSearch: (val: any) => void
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
-  const { onItemClick } = props
+  const { onItemClick, searchText, handleSearch } = props
   return (
     <S.ToolbarContainer>
       <div onClick={() => onItemClick("sort")}>First Name</div>
-      <div>Search</div>
+      {/* <div>Search</div> */}
+      <Search value={searchText} onSearch={handleSearch} />
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
   )
