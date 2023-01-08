@@ -9,11 +9,11 @@ import { Person } from "shared/models/person"
 interface Props {
   type: RolllStateType
   size?: number
-  onClick?: (id:number) => void
-  student?:Person
+  onClick?: (id: number) => void
+  student?: Person
 }
 export const RollStateIcon: React.FC<Props> = (props) => {
-  const { type, size = 20, onClick,student } = props
+  const { type, size = 20, onClick, student } = props
   return (
     <S.Icon size={size} border={type === "unmark"} bgColor={getBgColor(type)} clickable={Boolean(onClick)} onClick={() => onClick(student?.id)}>
       <FontAwesomeIcon icon="check" size={size > 14 ? "lg" : "sm"} />

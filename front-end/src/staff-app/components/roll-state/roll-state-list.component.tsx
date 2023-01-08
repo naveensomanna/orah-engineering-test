@@ -10,7 +10,7 @@ interface Props {
   size?: number
 }
 export const RollStateList: React.FC<Props> = ({ size = 14 }) => {
-  const { roleStateList: stateList, onItemClick } = useContext(StudentsRollsData)
+  const { roleStateList: stateList = [], onItemClick } = useContext(StudentsRollsData)
 
   const onClick = (type: ItemType) => {
     if (onItemClick) {

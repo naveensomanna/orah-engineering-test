@@ -10,7 +10,7 @@ import { StudentsRollsData } from "staff-app/daily-care/home-board.page"
 
 interface Props {
   student: Person
-  roleState: RolllStateType
+  roleState: RolllStateType 
 }
 export const StudentListTile: React.FC<Props> = ({ student, roleState }) => {
   const { isRollMode, onStateChange } = useContext(StudentsRollsData)

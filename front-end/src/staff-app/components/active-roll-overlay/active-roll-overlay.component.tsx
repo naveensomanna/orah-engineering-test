@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { memo, useContext } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/Button"
 import { BorderRadius, Spacing } from "shared/styles/styles"
@@ -7,9 +7,8 @@ import { StudentsRollsData } from "staff-app/daily-care/home-board.page"
 
 export type ActiveRollAction = "filter" | "exit" | "complete"
 
-export const ActiveRollOverlay: React.FC = () => {
+export const ActiveRollOverlay: React.FC = memo(function ActiveRollOverlay ()  {
   const { isRollMode: isActive, onActiveRollAction: onItemClick } = useContext(StudentsRollsData)
-
   return (
     <S.Overlay isActive={isActive}>
       <S.Content>
@@ -28,7 +27,7 @@ export const ActiveRollOverlay: React.FC = () => {
       </S.Content>
     </S.Overlay>
   )
-}
+})
 
 const S = {
   Overlay: styled.div<{ isActive: boolean }>`

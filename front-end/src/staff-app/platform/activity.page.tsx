@@ -15,6 +15,7 @@ export const ActivityPage: React.FC = () => {
   const [getStudentdsData, result] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
 
   const [rollsData, setRollsData] = useState([])
+
   useEffect(() => {
     getStudentsRollData()
     getStudentdsData()
@@ -25,7 +26,7 @@ export const ActivityPage: React.FC = () => {
   }, [data])
 
   const getName = (id: number) => {
-    const studentData = result?.students.find((item) => item.id === id)
+    const studentData: Person = result?.students.find((item: Person) => item.id === id) || ({} as Person)
     return PersonHelper.getFullName(studentData)
   }
 
@@ -48,7 +49,7 @@ export const ActivityPage: React.FC = () => {
               </div>
             </AccordionSummary>
             <AccordionDetails className={styles.accordianDetails}>
-              {item?.entity?.student_roll_states.map((roll) => (
+              {item?.entity?.student_roll_states.map((roll: { student_id: string; roll_state: string }) => (
                 <div key={roll.student_id} className={styles.roll}>
                   <h2>{getName(+roll.student_id)}</h2>
                   <span className={`${styles[roll.roll_state]} ${styles.status}`}>{roll.roll_state}</span>
