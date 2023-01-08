@@ -122,6 +122,8 @@ export const HomeBoardPage: React.FC = () => {
       }
       const pojo = { student_roll_states: data }
       updateStudents(pojo)
+      setIsRollMode(false)
+      setStudentsRollData({})
     }
   }
 
