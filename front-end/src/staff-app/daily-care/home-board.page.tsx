@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, createContext, useContext } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/ButtonBase"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -11,6 +11,8 @@ import { StudentListTile } from "staff-app/components/student-list-tile/student-
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
 import { Search } from "./Search"
 import style from "./dailyCare.module.scss"
+import { faSort } from '@fortawesome/free-solid-svg-icons'
+import { Menu, MenuItem } from "@material-ui/core"
 
 const initialStateRoll = [
   { type: "all", count: 0 },
@@ -19,26 +21,88 @@ const initialStateRoll = [
   { type: "absent", count: 0 },
 ]
 
+export const StudentsRollsData = createContext({});
+
+
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
+  const [updateStudents, data1, loadState1] = useApi({ url: "save-roll" })
   const [searchText, setSearchText] = useState('');
   const [studentsData, setStudents] = useState<any>([])
   const [roleStateList, setRoleStateList] = useState(initialStateRoll)
   const [studentsRollData, setStudentsRollData] = useState({})
-
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [sortBy, setSortBy] = useState("asc");
 
   useEffect(() => {
     void getStudents()
   }, [getStudents])
 
+  const ascendingOrder = () => {
+    return data?.students.sort((a, b) => PersonHelper.getFullName(a) > PersonHelper.getFullName(b));
+  }
+
+  const firstNameOrder = () => {
+    return data?.students.sort((a, b) => a.first_name > b.first_name);
+  }
+
+  const lastNameOrder = () => {
+    return data?.students.sort((a, b) => a.last_name > b.last_name);
+  }
+
   useEffect(() => {
-    setStudents(data?.students)
+    const sorted = ascendingOrder();
+    setStudents(sorted)
+
   }, [data])
+
+
+
+  const descendingOrder = () => {
+    return data?.students.sort((a, b) => PersonHelper.getFullName(a) > PersonHelper.getFullName(b)).reverse();
+  }
+
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleClickMenu = (key: string) => {
+    setSortBy(key);
+    if (key === "asc") {
+      const ascOrder = ascendingOrder();
+      setStudents(ascOrder);
+
+    } else if (key === "desc") {
+      const descOrder = descendingOrder();
+      setStudents(descOrder);
+    } else if (key === "firstName") {
+      const firstNameSort = firstNameOrder();
+      setStudents(firstNameSort)
+    } else {
+      const firstNameSort = lastNameOrder();
+      setStudents(firstNameSort)
+    }
+    handleClose();
+  }
+
 
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
       setIsRollMode(true)
+      const updatedAllCount = roleStateList.map((item) => {
+        if (item.type === "all") {
+          return { ...item, count: data?.students.length }
+        }
+        return item
+      })
+      setRoleStateList(updatedAllCount)
+
     }
   }
 
@@ -47,6 +111,17 @@ export const HomeBoardPage: React.FC = () => {
       setIsRollMode(false)
       setStudentsRollData({});
       setRoleStateList(initialStateRoll)
+      setStudents(data?.students)
+    } else if(Object.keys(studentsRollData)?.length>0){
+      let data = []
+      for (let i in studentsRollData) {
+        data.push({
+          student_id: i,
+          roll_state: studentsRollData[i]
+        })
+      }
+      const pojo = { student_roll_states: data }
+      updateStudents(pojo)
     }
   }
 
@@ -75,15 +150,43 @@ export const HomeBoardPage: React.FC = () => {
         }
         return acc;
       }, 0)
-      return { ...item, count }
+      return { ...item, count: item.type === "all" ? item.count : count }
 
     })
+
     setRoleStateList(updated);
   }
+
+
+  // filter roll wise
+
+  const onItemClick = (type: string) => {
+    let filterIds = []
+    for (let i in studentsRollData) {
+      if (studentsRollData[i] === type) {
+        filterIds.push(+i);
+      }
+    }
+    const filterRolls = data?.students.filter((item) => filterIds.includes(item.id));
+    setStudents(filterRolls)
+  }
+
   return (
-    <>
+    <StudentsRollsData.Provider value={{
+      searchText,
+      handleSearch,
+      anchorEl,
+      handleClickMenu,
+      handleClick,
+      sortBy,
+      isRollMode,
+      onStateChange,
+      roleStateList,
+      onActiveRollAction,
+      onItemClick
+    }}>
       <S.PageContainer>
-        <Toolbar onItemClick={onToolbarAction} searchText={searchText} handleSearch={handleSearch} />
+        <Toolbar onItemClick={onToolbarAction} />
 
         {loadState === "loading" && (
           <CenteredContainer>
@@ -95,7 +198,7 @@ export const HomeBoardPage: React.FC = () => {
           studentsData?.length > 0 ? (
             <>
               {studentsData.map((s: any) => (
-                <StudentListTile key={s.id} isRollMode={isRollMode} student={s} onStateChange={onStateChange} roleState={studentsRollData[s.id]}/>
+                <StudentListTile key={s.id} student={s} roleState={studentsRollData[s.id]} />
               ))}
             </>
           ) : (<p className={style.notFoonItemClickund}>Results not found</p>)
@@ -107,24 +210,34 @@ export const HomeBoardPage: React.FC = () => {
           </CenteredContainer>
         )}
       </S.PageContainer>
-      <ActiveRollOverlay isActive={isRollMode} onItemClick={onActiveRollAction} stateList={roleStateList} />
-    </>
+      <ActiveRollOverlay />
+    </StudentsRollsData.Provider>
   )
 }
 
 type ToolbarAction = "roll" | "sort"
 interface ToolbarProps {
   onItemClick: (action: ToolbarAction, value?: string) => void
-  searchText: string
-  handleSearch: (val: any) => void
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
-  const { onItemClick, searchText, handleSearch } = props
+  const { onItemClick, } = props
+  const { handleClick, anchorEl, handleClose, sortBy, handleClickMenu } = useContext(StudentsRollsData)
+
+  const options = [{ key: "asc", label: "Asc order" }, { key: "desc", label: "Desc order" }, { key: "firstName", label: "Sort by FirstName" }, { key: "lastName", label: "Sort by LastName" }]
   return (
     <S.ToolbarContainer>
-      <div onClick={() => onItemClick("sort")}>First Name</div>
-      {/* <div>Search</div> */}
-      <Search value={searchText} onSearch={handleSearch} />
+      <div onClick={handleClick} aria-controls="simple-menu"><FontAwesomeIcon icon={faSort} /></div>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        {options.map((option) => <MenuItem key={option.key} selected={sortBy === option.key} value={option.key} onClick={() => handleClickMenu(option.key)}>{option.label}</MenuItem>
+        )}
+      </Menu>
+      <Search />
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
     </S.ToolbarContainer>
   )

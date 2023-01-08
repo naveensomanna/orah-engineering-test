@@ -1,16 +1,18 @@
-import React from "react"
+import React, { useContext } from "react"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { RollStateIcon } from "staff-app/components/roll-state/roll-state-icon.component"
 import { Spacing, FontWeight } from "shared/styles/styles"
 import { RolllStateType } from "shared/models/roll"
+import { StudentsRollsData } from "staff-app/daily-care/home-board.page"
 
 interface Props {
-  stateList: StateList[]
-  onItemClick?: (type: ItemType) => void
   size?: number
 }
-export const RollStateList: React.FC<Props> = ({ stateList, size = 14, onItemClick }) => {
+export const RollStateList: React.FC<Props> = ({  size = 14, }) => {
+
+  const {roleStateList:stateList,onItemClick}=useContext(StudentsRollsData)
+
   const onClick = (type: ItemType) => {
     if (onItemClick) {
       onItemClick(type)
