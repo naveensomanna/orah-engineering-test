@@ -7,7 +7,6 @@ import { StudentsRollsData } from "staff-app/daily-care/home-board.page"
 
 export type ActiveRollAction = "filter" | "exit" | "complete"
 
-
 export const ActiveRollOverlay: React.FC = () => {
   const { isRollMode: isActive, onActiveRollAction: onItemClick } = useContext(StudentsRollsData)
 
@@ -16,8 +15,7 @@ export const ActiveRollOverlay: React.FC = () => {
       <S.Content>
         <div>Class Attendance</div>
         <div>
-          <RollStateList
-          />
+          <RollStateList />
           <div style={{ marginTop: Spacing.u6 }}>
             <Button color="inherit" onClick={() => onItemClick("exit")}>
               Exit

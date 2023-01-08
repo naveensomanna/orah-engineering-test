@@ -17,7 +17,6 @@ export function useApi<ReturnType = {}>({ url, initialLoadState = "loading" }: O
 
       function process(result: ApiResponse<ReturnType>) {
         if (result.success) {
-          console.log("called",result)
           dispatch({ type: "success", result: result })
         } else if (result.error) {
           dispatch({ type: "error", error: result.error })

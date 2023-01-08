@@ -9,9 +9,8 @@ import { StudentsRollsData } from "staff-app/daily-care/home-board.page"
 interface Props {
   size?: number
 }
-export const RollStateList: React.FC<Props> = ({  size = 14, }) => {
-
-  const {roleStateList:stateList,onItemClick}=useContext(StudentsRollsData)
+export const RollStateList: React.FC<Props> = ({ size = 14 }) => {
+  const { roleStateList: stateList, onItemClick } = useContext(StudentsRollsData)
 
   const onClick = (type: ItemType) => {
     if (onItemClick) {

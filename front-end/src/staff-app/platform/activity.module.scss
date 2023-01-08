@@ -1,37 +1,37 @@
 .accordianDetails {
-    flex-direction: column;
+  flex-direction: column;
 
-    .header {
-        display: flex;
-        align-items: center;
+  .header {
+    display: flex;
+    align-items: center;
+  }
+
+  .roll {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid grey;
+
+    .status {
+      padding: 0.5rem 0.8rem;
+      border-radius: 4px;
+      color: aliceblue;
+      width: 78px;
+      text-align: center;
+      box-sizing: border-box;
+      text-transform: capitalize;
     }
 
-    .roll {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid grey;
-
-        .status {
-            padding: 0.5rem 0.8rem;
-            border-radius: 4px;
-            color: aliceblue;
-            width: 78px;
-            text-align: center;
-            box-sizing: border-box;
-            text-transform: capitalize;
-        }
-
-        .present {
-            background-color: green;
-        }
-
-        .late {
-            background-color: #f5a623;
-        }
-
-        .absent {
-            background-color: #9b9b9b;
-        }
+    .present {
+      background-color: green;
     }
+
+    .late {
+      background-color: #f5a623;
+    }
+
+    .absent {
+      background-color: #9b9b9b;
+    }
+  }
 }

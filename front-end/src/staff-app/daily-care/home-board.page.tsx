@@ -11,7 +11,7 @@ import { StudentListTile } from "staff-app/components/student-list-tile/student-
 import { ActiveRollOverlay, ActiveRollAction } from "staff-app/components/active-roll-overlay/active-roll-overlay.component"
 import { Search } from "./Search"
 import style from "./dailyCare.module.scss"
-import { faSort } from '@fortawesome/free-solid-svg-icons'
+import { faSort } from "@fortawesome/free-solid-svg-icons"
 import { Menu, MenuItem } from "@material-ui/core"
 
 const initialStateRoll = [
@@ -21,76 +21,69 @@ const initialStateRoll = [
   { type: "absent", count: 0 },
 ]
 
-export const StudentsRollsData = createContext({});
-
+export const StudentsRollsData = createContext({})
 
 export const HomeBoardPage: React.FC = () => {
   const [isRollMode, setIsRollMode] = useState(false)
   const [getStudents, data, loadState] = useApi<{ students: Person[] }>({ url: "get-homeboard-students" })
   const [updateStudents, data1, loadState1] = useApi({ url: "save-roll" })
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("")
   const [studentsData, setStudents] = useState<any>([])
   const [roleStateList, setRoleStateList] = useState(initialStateRoll)
   const [studentsRollData, setStudentsRollData] = useState({})
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [sortBy, setSortBy] = useState("asc");
+  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [sortBy, setSortBy] = useState("asc")
 
   useEffect(() => {
     void getStudents()
   }, [getStudents])
 
   const ascendingOrder = () => {
-    return data?.students.sort((a, b) => PersonHelper.getFullName(a) > PersonHelper.getFullName(b));
+    return data?.students.sort((a, b) => PersonHelper.getFullName(a) > PersonHelper.getFullName(b))
   }
 
   const firstNameOrder = () => {
-    return data?.students.sort((a, b) => a.first_name > b.first_name);
+    return data?.students.sort((a, b) => a.first_name > b.first_name)
   }
 
   const lastNameOrder = () => {
-    return data?.students.sort((a, b) => a.last_name > b.last_name);
+    return data?.students.sort((a, b) => a.last_name > b.last_name)
   }
 
   useEffect(() => {
-    const sorted = ascendingOrder();
+    const sorted = ascendingOrder()
     setStudents(sorted)
-
   }, [data])
 
-
-
   const descendingOrder = () => {
-    return data?.students.sort((a, b) => PersonHelper.getFullName(a) > PersonHelper.getFullName(b)).reverse();
+    return data?.students.sort((a, b) => PersonHelper.getFullName(a) > PersonHelper.getFullName(b)).reverse()
   }
-
 
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleClickMenu = (key: string) => {
-    setSortBy(key);
-    if (key === "asc") {
-      const ascOrder = ascendingOrder();
-      setStudents(ascOrder);
-
-    } else if (key === "desc") {
-      const descOrder = descendingOrder();
-      setStudents(descOrder);
-    } else if (key === "firstName") {
-      const firstNameSort = firstNameOrder();
-      setStudents(firstNameSort)
-    } else {
-      const firstNameSort = lastNameOrder();
-      setStudents(firstNameSort)
-    }
-    handleClose();
+    setAnchorEl(event.currentTarget)
   }
 
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleClickMenu = (key: string) => {
+    setSortBy(key)
+    if (key === "asc") {
+      const ascOrder = ascendingOrder()
+      setStudents(ascOrder)
+    } else if (key === "desc") {
+      const descOrder = descendingOrder()
+      setStudents(descOrder)
+    } else if (key === "firstName") {
+      const firstNameSort = firstNameOrder()
+      setStudents(firstNameSort)
+    } else {
+      const firstNameSort = lastNameOrder()
+      setStudents(firstNameSort)
+    }
+    handleClose()
+  }
 
   const onToolbarAction = (action: ToolbarAction) => {
     if (action === "roll") {
@@ -102,22 +95,21 @@ export const HomeBoardPage: React.FC = () => {
         return item
       })
       setRoleStateList(updatedAllCount)
-
     }
   }
 
   const onActiveRollAction = (action: ActiveRollAction) => {
     if (action === "exit") {
       setIsRollMode(false)
-      setStudentsRollData({});
+      setStudentsRollData({})
       setRoleStateList(initialStateRoll)
       setStudents(data?.students)
-    } else if(Object.keys(studentsRollData)?.length>0){
+    } else if (Object.keys(studentsRollData)?.length > 0) {
       let data = []
       for (let i in studentsRollData) {
         data.push({
           student_id: i,
-          roll_state: studentsRollData[i]
+          roll_state: studentsRollData[i],
         })
       }
       const pojo = { student_roll_states: data }
@@ -137,7 +129,7 @@ export const HomeBoardPage: React.FC = () => {
   }
 
   const handleSearch = (e: any) => {
-    const { value } = e.target;
+    const { value } = e.target
     setSearchText(value)
     filterStudentsData(value)
   }
@@ -148,17 +140,15 @@ export const HomeBoardPage: React.FC = () => {
     const updated = roleStateList.map((item) => {
       let count = Object.values(idRoll).reduce((acc, cur) => {
         if (item.type === cur) {
-          acc += 1;
+          acc += 1
         }
-        return acc;
+        return acc
       }, 0)
       return { ...item, count: item.type === "all" ? item.count : count }
-
     })
 
-    setRoleStateList(updated);
+    setRoleStateList(updated)
   }
-
 
   // filter roll wise
 
@@ -166,27 +156,29 @@ export const HomeBoardPage: React.FC = () => {
     let filterIds = []
     for (let i in studentsRollData) {
       if (studentsRollData[i] === type) {
-        filterIds.push(+i);
+        filterIds.push(+i)
       }
     }
-    const filterRolls = data?.students.filter((item) => filterIds.includes(item.id));
+    const filterRolls = data?.students.filter((item) => filterIds.includes(item.id))
     setStudents(filterRolls)
   }
 
   return (
-    <StudentsRollsData.Provider value={{
-      searchText,
-      handleSearch,
-      anchorEl,
-      handleClickMenu,
-      handleClick,
-      sortBy,
-      isRollMode,
-      onStateChange,
-      roleStateList,
-      onActiveRollAction,
-      onItemClick
-    }}>
+    <StudentsRollsData.Provider
+      value={{
+        searchText,
+        handleSearch,
+        anchorEl,
+        handleClickMenu,
+        handleClick,
+        sortBy,
+        isRollMode,
+        onStateChange,
+        roleStateList,
+        onActiveRollAction,
+        onItemClick,
+      }}
+    >
       <S.PageContainer>
         <Toolbar onItemClick={onToolbarAction} />
 
@@ -196,15 +188,16 @@ export const HomeBoardPage: React.FC = () => {
           </CenteredContainer>
         )}
 
-        {loadState === "loaded" && (
-          studentsData?.length > 0 ? (
+        {loadState === "loaded" &&
+          (studentsData?.length > 0 ? (
             <>
               {studentsData.map((s: any) => (
                 <StudentListTile key={s.id} student={s} roleState={studentsRollData[s.id]} />
               ))}
             </>
-          ) : (<p className={style.notFoonItemClickund}>Results not found</p>)
-        )}
+          ) : (
+            <p className={style.notFoonItemClickund}>Results not found</p>
+          ))}
 
         {loadState === "error" && (
           <CenteredContainer>
@@ -222,22 +215,26 @@ interface ToolbarProps {
   onItemClick: (action: ToolbarAction, value?: string) => void
 }
 const Toolbar: React.FC<ToolbarProps> = (props) => {
-  const { onItemClick, } = props
+  const { onItemClick } = props
   const { handleClick, anchorEl, handleClose, sortBy, handleClickMenu } = useContext(StudentsRollsData)
 
-  const options = [{ key: "asc", label: "Asc order" }, { key: "desc", label: "Desc order" }, { key: "firstName", label: "Sort by FirstName" }, { key: "lastName", label: "Sort by LastName" }]
+  const options = [
+    { key: "asc", label: "Asc order" },
+    { key: "desc", label: "Desc order" },
+    { key: "firstName", label: "Sort by FirstName" },
+    { key: "lastName", label: "Sort by LastName" },
+  ]
   return (
     <S.ToolbarContainer>
-      <div onClick={handleClick} aria-controls="simple-menu"><FontAwesomeIcon icon={faSort} /></div>
-      <Menu
-        id="simple-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        {options.map((option) => <MenuItem key={option.key} selected={sortBy === option.key} value={option.key} onClick={() => handleClickMenu(option.key)}>{option.label}</MenuItem>
-        )}
+      <div onClick={handleClick} aria-controls="simple-menu">
+        <FontAwesomeIcon icon={faSort} />
+      </div>
+      <Menu id="simple-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+        {options.map((option) => (
+          <MenuItem key={option.key} selected={sortBy === option.key} value={option.key} onClick={() => handleClickMenu(option.key)}>
+            {option.label}
+          </MenuItem>
+        ))}
       </Menu>
       <Search />
       <S.Button onClick={() => onItemClick("roll")}>Start Roll</S.Button>
